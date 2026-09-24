@@ -1,4 +1,4 @@
-package com.example.guia8
+package com.example.guia8.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -23,16 +23,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.guia8.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onComenzarClick: () -> Unit
+) {
 
-    // Scaffold entrega la estructura principal de la pantalla
     Scaffold(
 
-        // Barra superior de la aplicación
         topBar = {
 
             TopAppBar(
@@ -41,7 +42,6 @@ fun HomeScreen() {
                     Text("Voxia")
                 },
 
-                // Utilizamos colores provenientes de MaterialTheme
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -51,7 +51,6 @@ fun HomeScreen() {
 
     ) { innerPadding ->
 
-        // Column organiza todos los elementos verticalmente
         Column(
 
             modifier = Modifier
@@ -59,47 +58,34 @@ fun HomeScreen() {
                 .fillMaxSize()
                 .padding(16.dp),
 
-            // Mantiene un espacio uniforme entre los elementos
             verticalArrangement = Arrangement.spacedBy(20.dp),
 
-            // Centra horizontalmente los elementos
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // Título principal de bienvenida
             Text(
                 text = "¡Bienvenido a Voxia!",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary
             )
 
-
-            // Texto secundario
             Text(
                 text = "Tu espacio para comunicarte y compartir.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-
-            // Logo de la aplicación
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo de Voxia",
-
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
-
                 contentScale = ContentScale.Fit
             )
 
-
-            // Línea divisoria para separar visualmente el contenido
             HorizontalDivider()
 
-
-            // Tarjeta informativa
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -121,14 +107,9 @@ fun HomeScreen() {
                 }
             }
 
-
-            // Botón principal
             Button(
-                onClick = {
-                    // Acción futura del botón
-                }
+                onClick = onComenzarClick
             ) {
-
                 Text("Comenzar")
             }
         }
@@ -141,6 +122,8 @@ fun HomeScreen() {
 fun HomeScreenPreview() {
 
     MaterialTheme {
-        HomeScreen()
+        HomeScreen(
+            onComenzarClick = {}
+        )
     }
 }

@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.example.guia8.navigation.AppNavigation
+import com.example.guia8.ui.screens.HomeScreen
 import com.example.guia8.ui.theme.Guia8Theme
 
 class MainActivity : ComponentActivity() {
@@ -15,7 +17,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Guia8Theme {
-                HomeScreen()
+                AppNavigation()
             }
         }
     }

@@ -3,19 +3,24 @@ package com.example.guia8
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import com.example.guia8.ui.theme.Guia8Theme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
-
         setContent {
-            Guia8Theme {
-                HomeScreen()
+            MaterialTheme {
+                // Surface es el fondo de la aplicación
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    // Aquí llamamos a la pantalla del juego
+                    HomeScreen()
+                }
             }
         }
     }

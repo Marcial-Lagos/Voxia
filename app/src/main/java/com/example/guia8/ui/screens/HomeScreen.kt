@@ -12,6 +12,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,44 +26,34 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.guia8.R
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onComenzarClick: () -> Unit
+    onComenzarClick: () -> Unit,
+    onJugarClick: () -> Unit
 ) {
-
     Scaffold(
-
         topBar = {
-
             TopAppBar(
-
                 title = {
                     Text("Voxia")
                 },
-
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
         }
-
     ) { innerPadding ->
 
         Column(
-
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp),
-
             verticalArrangement = Arrangement.spacedBy(20.dp),
-
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Text(
                 text = "¡Bienvenido a Voxia!",
                 style = MaterialTheme.typography.headlineMedium,
@@ -70,7 +61,7 @@ fun HomeScreen(
             )
 
             Text(
-                text = "Tu espacio para comunicarte y compartir.",
+                text = "Aprende español jugando con palabras en turco.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -89,41 +80,46 @@ fun HomeScreen(
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
-
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
                     Text(
-                        text = "Comienza a explorar",
+                        text = "Doğru mu? — ¿Es verdad?",
                         style = MaterialTheme.typography.titleMedium
                     )
 
                     Text(
-                        text = "Accede a las funciones principales de Voxia desde esta pantalla.",
+                        text = "Decide si la traducción Turco-Español es verdadera o falsa.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
 
             Button(
-                onClick = onComenzarClick
+                onClick = onJugarClick,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Comenzar")
+                Text("Jugar Doğru mu?")
+            }
+
+            OutlinedButton(
+                onClick = onComenzarClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Ir a Perfil")
             }
         }
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-
     MaterialTheme {
         HomeScreen(
-            onComenzarClick = {}
+            onComenzarClick = {},
+            onJugarClick = {}
         )
     }
 }

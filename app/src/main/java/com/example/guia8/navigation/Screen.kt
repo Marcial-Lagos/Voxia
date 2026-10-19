@@ -1,4 +1,3 @@
-
 package com.example.guia8.navigation
 
 sealed class Screen(val route: String) {
@@ -8,4 +7,6 @@ sealed class Screen(val route: String) {
     object Perfil : Screen("perfil")
 
     object Settings : Screen("settings")
+
+    object Juego : Screen("juego")
 }

@@ -1,6 +1,8 @@
 package com.example.guia8.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,6 +18,7 @@ fun AppNavigation() {
 
     val navController = rememberNavController()
     val juegoViewModel: JuegoViewModel = viewModel()
+    val estadoJuego by juegoViewModel.estado.collectAsState()
 
     NavHost(
         navController = navController,
@@ -30,7 +33,9 @@ fun AppNavigation() {
                 onJugarClick = {
                     juegoViewModel.reiniciarJuego()
                     navController.navigate(Screen.Juego.route)
-                }
+                },
+                mejorPuntaje = estadoJuego.mejorPuntaje,
+                cargandoRecord = estadoJuego.cargandoPreferencias
             )
         }
 

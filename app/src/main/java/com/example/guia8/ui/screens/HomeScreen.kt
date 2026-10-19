@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +31,9 @@ import com.example.guia8.R
 @Composable
 fun HomeScreen(
     onComenzarClick: () -> Unit,
-    onJugarClick: () -> Unit
+    onJugarClick: () -> Unit,
+    mejorPuntaje: Int,
+    cargandoRecord: Boolean
 ) {
     Scaffold(
         topBar = {
@@ -93,6 +96,16 @@ fun HomeScreen(
                         text = "Decide si la traducción Turco-Español es verdadera o falsa.",
                         style = MaterialTheme.typography.bodyMedium
                     )
+
+                    if (cargandoRecord) {
+                        CircularProgressIndicator()
+                    } else {
+                        Text(
+                            text = "🏆 Mejor puntaje: $mejorPuntaje",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
 
@@ -119,7 +132,9 @@ fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen(
             onComenzarClick = {},
-            onJugarClick = {}
+            onJugarClick = {},
+            mejorPuntaje = 4,
+            cargandoRecord = false
         )
     }
 }

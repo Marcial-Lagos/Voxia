@@ -1,13 +1,21 @@
 package com.example.guia8.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.guia8.data.PreferenciasDataStore
 import com.example.guia8.model.JuegoUiState
 import com.example.guia8.model.TarjetaJuego
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class JuegoViewModel : ViewModel() {
+class JuegoViewModel(
+    application: Application
+) : AndroidViewModel(application) {
+
+    private val preferenciasDataStore = PreferenciasDataStore(application)
 
     // Tarjetas iniciales del MVP. Más adelante se pueden mover a una fuente de datos separada.
     private val tarjetas = listOf(
@@ -30,6 +38,23 @@ class JuegoViewModel : ViewModel() {
 
     val totalTarjetas: Int
         get() = tarjetas.size
+
+    init {
+        observarMejorPuntaje()
+    }
+
+    private fun observarMejorPuntaje() {
+        viewModelScope.launch {
+            preferenciasDataStore.mejorPuntaje.collect { recordGuardado ->
+                _estado.update {
+                    it.copy(
+                        mejorPuntaje = recordGuardado,
+                        cargandoPreferencias = false
+                    )
+                }
+            }
+        }
+    }
 
     // Evalúa la opción elegida por el usuario: true = Verdadero, false = Falso.
     fun responder(respuestaUsuario: Boolean) {
@@ -65,11 +90,14 @@ class JuegoViewModel : ViewModel() {
         val ultimaTarjeta = estadoActual.indiceActual >= tarjetas.lastIndex
 
         if (sinVidas || ultimaTarjeta) {
+            guardarRecordSiCorresponde(estadoActual.puntaje)
+
             _estado.update {
                 it.copy(
                     mostrarFeedback = false,
                     respuestaCorrecta = null,
-                    juegoTerminado = true
+                    juegoTerminado = true,
+                    mejorPuntaje = maxOf(it.mejorPuntaje, it.puntaje)
                 )
             }
             return
@@ -87,9 +115,23 @@ class JuegoViewModel : ViewModel() {
         }
     }
 
+    private fun guardarRecordSiCorresponde(puntajeFinal: Int) {
+        if (puntajeFinal <= _estado.value.mejorPuntaje) {
+            return
+        }
+
+        viewModelScope.launch {
+            preferenciasDataStore.guardarMejorPuntaje(puntajeFinal)
+        }
+    }
+
     fun reiniciarJuego() {
+        val estadoActual = _estado.value
+
         _estado.value = JuegoUiState(
-            tarjetaActual = tarjetas.firstOrNull()
+            tarjetaActual = tarjetas.firstOrNull(),
+            mejorPuntaje = estadoActual.mejorPuntaje,
+            cargandoPreferencias = estadoActual.cargandoPreferencias
         )
     }
 }

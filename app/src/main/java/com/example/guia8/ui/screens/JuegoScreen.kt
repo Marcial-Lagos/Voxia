@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.weight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -56,6 +57,7 @@ fun JuegoScreen(
         JuegoTerminado(
             puntaje = estado.puntaje,
             totalTarjetas = viewModel.totalTarjetas,
+            mejorPuntaje = estado.mejorPuntaje,
             onReiniciar = viewModel::reiniciarJuego,
             onVolverInicio = onVolverInicio
         )
@@ -81,6 +83,17 @@ fun JuegoScreen(
             text = "¿Es verdad?",
             style = MaterialTheme.typography.titleMedium
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (estado.cargandoPreferencias) {
+            CircularProgressIndicator()
+        } else {
+            Text(
+                text = "🏆 Mejor puntaje: ${estado.mejorPuntaje}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -191,6 +204,7 @@ fun JuegoScreen(
 private fun JuegoTerminado(
     puntaje: Int,
     totalTarjetas: Int,
+    mejorPuntaje: Int,
     onReiniciar: () -> Unit,
     onVolverInicio: () -> Unit
 ) {
@@ -212,6 +226,14 @@ private fun JuegoTerminado(
         Text(
             text = "Puntaje: $puntaje / $totalTarjetas",
             style = MaterialTheme.typography.titleLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "🏆 Mejor puntaje: $mejorPuntaje",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(24.dp))

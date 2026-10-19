@@ -10,9 +10,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay // <-- Importante para hacer la pausa de 1 segundo
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.delay
 
-// 1. Estructura de Datos
+// ==========================================
+// 1. MODELO (Model)
+// ==========================================
 data class Flashcard(
     val turkishWord: String,
     val proposedSpanish: String,
@@ -29,42 +33,65 @@ val gameLevels = listOf(
     Flashcard("Ekmek", "Queso", false)
 )
 
-// 2. Pantalla Principal
-@Composable
-fun HomeScreen() {
-    var currentIndex by remember { mutableIntStateOf(0) }
-    var score by remember { mutableIntStateOf(0) }
-    var isGameOver by remember { mutableStateOf(false) }
+// ==========================================
+// 2. VIEWMODEL (El cerebro y la lógica)
+// ==========================================
+class GameViewModel : ViewModel() {
+    var currentIndex by mutableIntStateOf(0)
+        private set
+    var score by mutableIntStateOf(0)
+        private set
+    var isGameOver by mutableStateOf(false)
+        private set
+    var showFeedback by mutableStateOf(false)
+        private set
+    var isAnswerCorrect by mutableStateOf(false)
+        private set
 
-    // Nuevas variables para controlar el mensaje de "Correcto/Incorrecto"
-    var showFeedback by remember { mutableStateOf(false) }
-    var isAnswerCorrect by remember { mutableStateOf(false) }
+    val currentCard: Flashcard
+        get() = gameLevels[currentIndex]
 
-    // Este bloque hace la pausa: Si showFeedback es true, espera 1 segundo y avanza
-    LaunchedEffect(showFeedback) {
-        if (showFeedback) {
-            delay(1000) // Espera 1000 milisegundos (1 segundo)
-            showFeedback = false // Oculta el mensaje
+    fun checkAnswer(userSelectedTrue: Boolean) {
+        isAnswerCorrect = (currentCard.isTranslationCorrect == userSelectedTrue)
+        if (isAnswerCorrect) score++
+        showFeedback = true
+    }
 
-            // Avanza de nivel o termina el juego
-            if (currentIndex < gameLevels.size - 1) {
-                currentIndex++
-            } else {
-                isGameOver = true
-            }
+    fun advanceLevel() {
+        showFeedback = false
+        if (currentIndex < gameLevels.size - 1) {
+            currentIndex++
+        } else {
+            isGameOver = true
         }
     }
 
-    if (isGameOver) {
-        GameOverScreen(score = score) {
-            currentIndex = 0
-            score = 0
-            isGameOver = false
-            showFeedback = false
+    fun resetGame() {
+        currentIndex = 0
+        score = 0
+        isGameOver = false
+        showFeedback = false
+    }
+}
+
+// ==========================================
+// 3. VISTA (View)
+// ==========================================
+@Composable
+fun HomeScreen(viewModel: GameViewModel = viewModel()) {
+
+    LaunchedEffect(viewModel.showFeedback) {
+        if (viewModel.showFeedback) {
+            delay(1000)
+            viewModel.advanceLevel()
+        }
+    }
+
+    if (viewModel.isGameOver) {
+        GameOverScreen(score = viewModel.score) {
+            viewModel.resetGame()
         }
     } else {
-        val currentCard = gameLevels[currentIndex]
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -72,25 +99,23 @@ fun HomeScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Nivel ${currentIndex + 1} de ${gameLevels.size}", fontSize = 18.sp)
+            Text(text = "Nivel ${viewModel.currentIndex + 1} de ${gameLevels.size}", fontSize = 18.sp)
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(text = currentCard.turkishWord, fontSize = 48.sp, fontWeight = FontWeight.Bold)
+            Text(text = viewModel.currentCard.turkishWord, fontSize = 48.sp, fontWeight = FontWeight.Bold)
             Text(text = "¿Significa...", fontSize = 20.sp, modifier = Modifier.padding(top = 16.dp))
-            Text(text = "\"${currentCard.proposedSpanish}\"?", fontSize = 32.sp, color = MaterialTheme.colorScheme.primary)
+            Text(text = "\"${viewModel.currentCard.proposedSpanish}\"?", fontSize = 32.sp, color = MaterialTheme.colorScheme.primary)
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Aquí mostramos el mensaje de Correcto o Incorrecto
-            if (showFeedback) {
+            if (viewModel.showFeedback) {
                 Text(
-                    text = if (isAnswerCorrect) "¡Correcto! 🎉" else "¡Incorrecto! ❌",
+                    text = if (viewModel.isAnswerCorrect) "¡Correcto! 🎉" else "¡Incorrecto! ❌",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isAnswerCorrect) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error
+                    color = if (viewModel.isAnswerCorrect) Color(0xFF4CAF50) else MaterialTheme.colorScheme.error
                 )
             } else {
-                // Espacio vacío para que los botones no salten hacia arriba y abajo
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
@@ -100,28 +125,18 @@ fun HomeScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Botón VERDADERO
                 Button(
-                    onClick = {
-                        isAnswerCorrect = (currentCard.isTranslationCorrect == true)
-                        if (isAnswerCorrect) score++
-                        showFeedback = true // Muestra el mensaje y activa la pausa
-                    },
+                    onClick = { viewModel.checkAnswer(true) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                    enabled = !showFeedback // Desactiva el botón mientras sale el mensaje
+                    enabled = !viewModel.showFeedback
                 ) {
                     Text("Verdadero", fontSize = 18.sp)
                 }
 
-                // Botón FALSO
                 Button(
-                    onClick = {
-                        isAnswerCorrect = (currentCard.isTranslationCorrect == false)
-                        if (isAnswerCorrect) score++
-                        showFeedback = true // Muestra el mensaje y activa la pausa
-                    },
+                    onClick = { viewModel.checkAnswer(false) },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    enabled = !showFeedback // Desactiva el botón mientras sale el mensaje
+                    enabled = !viewModel.showFeedback
                 ) {
                     Text("Falso", fontSize = 18.sp)
                 }
@@ -130,7 +145,6 @@ fun HomeScreen() {
     }
 }
 
-// 3. Pantalla de Resultados
 @Composable
 fun GameOverScreen(score: Int, onRestart: () -> Unit) {
     Column(
@@ -148,7 +162,6 @@ fun GameOverScreen(score: Int, onRestart: () -> Unit) {
     }
 }
 
-// 4. Vista Previa
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {

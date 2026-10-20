@@ -33,7 +33,7 @@ fun vibrarAcierto(context: Context) {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
             vibrator.vibrate(
                 VibrationEffect.createOneShot(
-                    80L,
+                    300L,
                     VibrationEffect.DEFAULT_AMPLITUDE
                 )
             )
@@ -41,7 +41,7 @@ fun vibrarAcierto(context: Context) {
 
         else -> {
             @Suppress("DEPRECATION")
-            vibrator.vibrate(80L)
+            vibrator.vibrate(300L)
         }
     }
 }

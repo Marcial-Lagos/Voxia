@@ -10,15 +10,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.guia8.ui.screens.HomeScreen
 import com.example.guia8.ui.screens.JuegoScreen
 import com.example.guia8.ui.screens.PerfilScreen
+import com.example.guia8.ui.screens.RegistroScreen
+import com.example.guia8.ui.screens.ResumenScreen
 import com.example.guia8.ui.screens.SettingsScreen
 import com.example.guia8.viewmodel.JuegoViewModel
+import com.example.guia8.viewmodel.UsuarioViewModel
 
 @Composable
 fun AppNavigation() {
 
     val navController = rememberNavController()
+
     val juegoViewModel: JuegoViewModel = viewModel()
     val estadoJuego by juegoViewModel.estado.collectAsState()
+
+    val usuarioViewModel: UsuarioViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -27,15 +33,45 @@ fun AppNavigation() {
 
         composable(Screen.Home.route) {
             HomeScreen(
-                onComenzarClick = {
-                    navController.navigate(Screen.Perfil.route)
-                },
                 onJugarClick = {
                     juegoViewModel.reiniciarJuego()
                     navController.navigate(Screen.Juego.route)
                 },
+                onRegistroClick = {
+                    navController.navigate(Screen.Registro.route)
+                },
+                onPerfilClick = {
+                    navController.navigate(Screen.Perfil.route)
+                },
                 mejorPuntaje = estadoJuego.mejorPuntaje,
                 cargandoRecord = estadoJuego.cargandoPreferencias
+            )
+        }
+
+        composable(Screen.Registro.route) {
+            RegistroScreen(
+                viewModel = usuarioViewModel,
+                onRegistroExitoso = {
+                    navController.navigate(Screen.Resumen.route)
+                },
+                onVolverClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Resumen.route) {
+            ResumenScreen(
+                viewModel = usuarioViewModel,
+                onInicioClick = {
+                    navController.popBackStack(
+                        route = Screen.Home.route,
+                        inclusive = false
+                    )
+                },
+                onPerfilClick = {
+                    navController.navigate(Screen.Perfil.route)
+                }
             )
         }
 

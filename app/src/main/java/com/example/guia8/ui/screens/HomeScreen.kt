@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -30,8 +31,9 @@ import com.example.guia8.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onComenzarClick: () -> Unit,
     onJugarClick: () -> Unit,
+    onRegistroClick: () -> Unit,
+    onPerfilClick: () -> Unit,
     mejorPuntaje: Int,
     cargandoRecord: Boolean
 ) {
@@ -40,6 +42,13 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Text("Voxia")
+                },
+                actions = {
+                    TextButton(
+                        onClick = onPerfilClick
+                    ) {
+                        Text("Perfil")
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -117,10 +126,10 @@ fun HomeScreen(
             }
 
             OutlinedButton(
-                onClick = onComenzarClick,
+                onClick = onRegistroClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Ir a Perfil")
+                Text("Registrarse")
             }
         }
     }
@@ -131,8 +140,9 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     MaterialTheme {
         HomeScreen(
-            onComenzarClick = {},
             onJugarClick = {},
+            onRegistroClick = {},
+            onPerfilClick = {},
             mejorPuntaje = 4,
             cargandoRecord = false
         )

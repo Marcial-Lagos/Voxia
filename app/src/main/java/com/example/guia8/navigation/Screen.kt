@@ -4,6 +4,10 @@ sealed class Screen(val route: String) {
 
     object Home : Screen("home")
 
+    object Registro : Screen("registro")
+
+    object Resumen : Screen("resumen")
+
     object Perfil : Screen("perfil")
 
     object Settings : Screen("settings")

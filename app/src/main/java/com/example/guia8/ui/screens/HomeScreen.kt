@@ -183,9 +183,21 @@ fun HomeScreen(
             Button(
                 onClick = onJugarClick,
                 modifier =
-                    Modifier.fillMaxWidth()
+                    Modifier.fillMaxWidth(),
+                enabled = perfilActivoNombre != null
             ) {
                 Text("Jugar Doğru mu?")
+            }
+
+            if (perfilActivoNombre == null) {
+                Text(
+                    text =
+                        "Registra o selecciona un perfil para guardar tu puntaje.",
+                    style =
+                        MaterialTheme
+                            .typography
+                            .bodySmall
+                )
             }
 
             OutlinedButton(

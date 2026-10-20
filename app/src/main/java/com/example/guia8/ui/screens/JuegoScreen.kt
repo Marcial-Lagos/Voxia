@@ -1,5 +1,10 @@
 package com.example.guia8.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -136,7 +141,11 @@ fun JuegoScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (estado.mostrarFeedback) {
+        AnimatedVisibility(
+            visible = estado.mostrarFeedback,
+            enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+            exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
+        ) {
             Text(
                 text = if (estado.respuestaCorrecta == true) {
                     "¡Correcto! +1 punto"
@@ -152,7 +161,13 @@ fun JuegoScreen(
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
-        } else {
+        }
+
+        AnimatedVisibility(
+            visible = !estado.mostrarFeedback,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
             Text(
                 text = "¿La traducción es correcta?",
                 style = MaterialTheme.typography.titleMedium

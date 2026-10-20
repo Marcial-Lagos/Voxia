@@ -89,6 +89,7 @@ fun AppNavigation() {
 
         composable(Screen.Perfil.route) {
             PerfilScreen(
+                viewModel = usuarioViewModel,
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
                 },

@@ -138,7 +138,9 @@ fun RegistroScreen(
             Button(
                 onClick = {
                     if (viewModel.validarFormulario()) {
-                        onRegistroExitoso()
+                        viewModel.guardarPerfil {
+                            onRegistroExitoso()
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()

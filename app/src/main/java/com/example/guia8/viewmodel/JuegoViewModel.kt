@@ -4,10 +4,12 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.guia8.data.PreferenciasDataStore
+import com.example.guia8.data.local.VoxiaDatabase
 import com.example.guia8.model.JuegoUiState
 import com.example.guia8.model.TarjetaJuego
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -15,9 +17,12 @@ class JuegoViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val preferenciasDataStore = PreferenciasDataStore(application)
+    private val preferenciasDataStore =
+        PreferenciasDataStore(application)
 
-    // Tarjetas iniciales del MVP. Más adelante se pueden mover a una fuente de datos separada.
+    private val perfilDao =
+        VoxiaDatabase.obtenerInstancia(application).perfilDao()
+
     private val tarjetas = listOf(
         TarjetaJuego("Merhaba", "Hola", true),
         TarjetaJuego("Teşekkürler", "Adiós", false),
@@ -40,70 +45,108 @@ class JuegoViewModel(
         get() = tarjetas.size
 
     init {
-        observarMejorPuntaje()
+        observarPerfilActivo()
     }
 
-    private fun observarMejorPuntaje() {
+    private fun observarPerfilActivo() {
         viewModelScope.launch {
-            preferenciasDataStore.mejorPuntaje.collect { recordGuardado ->
-                _estado.update {
-                    it.copy(
-                        mejorPuntaje = recordGuardado,
-                        cargandoPreferencias = false
-                    )
+            preferenciasDataStore.perfilSeleccionadoId.collectLatest { perfilId ->
+
+                if (perfilId == null) {
+                    _estado.update {
+                        it.copy(
+                            perfilActivoId = null,
+                            perfilActivoNombre = null,
+                            mejorPuntaje = 0,
+                            cargandoPreferencias = false
+                        )
+                    }
+                    return@collectLatest
+                }
+
+                perfilDao.obtenerPerfilPorId(perfilId).collect { perfil ->
+                    _estado.update {
+                        it.copy(
+                            perfilActivoId = perfil?.id,
+                            perfilActivoNombre = perfil?.nombre,
+                            mejorPuntaje = perfil?.mejorPuntaje ?: 0,
+                            cargandoPreferencias = false
+                        )
+                    }
                 }
             }
         }
     }
 
-    // Evalúa la opción elegida por el usuario: true = Verdadero, false = Falso.
     fun responder(respuestaUsuario: Boolean) {
         val estadoActual = _estado.value
 
-        // Evita responder dos veces mientras se muestra el feedback.
-        if (estadoActual.mostrarFeedback || estadoActual.juegoTerminado) {
+        if (
+            estadoActual.mostrarFeedback ||
+            estadoActual.juegoTerminado
+        ) {
             return
         }
 
         val tarjeta = estadoActual.tarjetaActual ?: return
-        val acerto = respuestaUsuario == tarjeta.esCorrecta
+        val acerto =
+            respuestaUsuario == tarjeta.esCorrecta
 
         _estado.update {
             it.copy(
-                puntaje = if (acerto) it.puntaje + 1 else it.puntaje,
-                vidas = if (acerto) it.vidas else (it.vidas - 1).coerceAtLeast(0),
+                puntaje = if (acerto) {
+                    it.puntaje + 1
+                } else {
+                    it.puntaje
+                },
+                vidas = if (acerto) {
+                    it.vidas
+                } else {
+                    (it.vidas - 1).coerceAtLeast(0)
+                },
                 mostrarFeedback = true,
                 respuestaCorrecta = acerto
             )
         }
     }
 
-    // Se llama después de mostrar brevemente el mensaje Correcto/Incorrecto.
     fun avanzarTarjeta() {
         val estadoActual = _estado.value
 
-        if (!estadoActual.mostrarFeedback || estadoActual.juegoTerminado) {
+        if (
+            !estadoActual.mostrarFeedback ||
+            estadoActual.juegoTerminado
+        ) {
             return
         }
 
-        val sinVidas = estadoActual.vidas <= 0
-        val ultimaTarjeta = estadoActual.indiceActual >= tarjetas.lastIndex
+        val sinVidas =
+            estadoActual.vidas <= 0
+
+        val ultimaTarjeta =
+            estadoActual.indiceActual >= tarjetas.lastIndex
 
         if (sinVidas || ultimaTarjeta) {
-            guardarRecordSiCorresponde(estadoActual.puntaje)
+            guardarRecordSiCorresponde(
+                estadoActual.puntaje
+            )
 
             _estado.update {
                 it.copy(
                     mostrarFeedback = false,
                     respuestaCorrecta = null,
                     juegoTerminado = true,
-                    mejorPuntaje = maxOf(it.mejorPuntaje, it.puntaje)
+                    mejorPuntaje = maxOf(
+                        it.mejorPuntaje,
+                        it.puntaje
+                    )
                 )
             }
             return
         }
 
-        val siguienteIndice = estadoActual.indiceActual + 1
+        val siguienteIndice =
+            estadoActual.indiceActual + 1
 
         _estado.update {
             it.copy(
@@ -115,13 +158,25 @@ class JuegoViewModel(
         }
     }
 
-    private fun guardarRecordSiCorresponde(puntajeFinal: Int) {
-        if (puntajeFinal <= _estado.value.mejorPuntaje) {
+    private fun guardarRecordSiCorresponde(
+        puntajeFinal: Int
+    ) {
+        val estadoActual = _estado.value
+        val perfilId =
+            estadoActual.perfilActivoId ?: return
+
+        if (
+            puntajeFinal <=
+            estadoActual.mejorPuntaje
+        ) {
             return
         }
 
         viewModelScope.launch {
-            preferenciasDataStore.guardarMejorPuntaje(puntajeFinal)
+            perfilDao.actualizarMejorPuntaje(
+                perfilId = perfilId,
+                puntaje = puntajeFinal
+            )
         }
     }
 
@@ -131,7 +186,12 @@ class JuegoViewModel(
         _estado.value = JuegoUiState(
             tarjetaActual = tarjetas.firstOrNull(),
             mejorPuntaje = estadoActual.mejorPuntaje,
-            cargandoPreferencias = estadoActual.cargandoPreferencias
+            cargandoPreferencias =
+                estadoActual.cargandoPreferencias,
+            perfilActivoId =
+                estadoActual.perfilActivoId,
+            perfilActivoNombre =
+                estadoActual.perfilActivoNombre
         )
     }
 }

@@ -3,6 +3,7 @@ package com.example.guia8.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.guia8.data.PreferenciasDataStore
 import com.example.guia8.data.local.PerfilEntity
 import com.example.guia8.data.local.VoxiaDatabase
 import com.example.guia8.model.UsuarioErrores
@@ -20,7 +21,13 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     private val perfilDao =
         VoxiaDatabase.obtenerInstancia(application).perfilDao()
 
+    private val preferenciasDataStore =
+        PreferenciasDataStore(application)
+
     val perfiles = perfilDao.obtenerPerfiles()
+
+    val perfilSeleccionadoId =
+        preferenciasDataStore.perfilSeleccionadoId
 
     fun onNombreChange(valor: String) {
         _estado.update {
@@ -59,7 +66,9 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun onAceptarTerminosChange(valor: Boolean) {
-        _estado.update { it.copy(aceptaTerminos = valor) }
+        _estado.update {
+            it.copy(aceptaTerminos = valor)
+        }
     }
 
     fun validarFormulario(): Boolean {
@@ -95,7 +104,9 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
             errores.direccion
         ).isNotEmpty()
 
-        _estado.update { it.copy(errores = errores) }
+        _estado.update {
+            it.copy(errores = errores)
+        }
 
         return !hayErrores && estadoActual.aceptaTerminos
     }
@@ -110,8 +121,15 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         )
 
         viewModelScope.launch {
-            perfilDao.insertarPerfil(perfil)
+            val nuevoId = perfilDao.insertarPerfil(perfil).toInt()
+            preferenciasDataStore.seleccionarPerfil(nuevoId)
             onGuardado()
+        }
+    }
+
+    fun seleccionarPerfil(perfilId: Int) {
+        viewModelScope.launch {
+            preferenciasDataStore.seleccionarPerfil(perfilId)
         }
     }
 }

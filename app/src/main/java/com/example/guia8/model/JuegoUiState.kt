@@ -10,5 +10,7 @@ data class JuegoUiState(
     val respuestaCorrecta: Boolean? = null,
     val juegoTerminado: Boolean = false,
     val mejorPuntaje: Int = 0,
-    val cargandoPreferencias: Boolean = true
+    val cargandoPreferencias: Boolean = true,
+    val perfilActivoId: Int? = null,
+    val perfilActivoNombre: String? = null
 )

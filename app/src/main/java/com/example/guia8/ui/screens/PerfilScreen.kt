@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,7 +33,15 @@ fun PerfilScreen(
     onSettingsClick: () -> Unit,
     onVolverClick: () -> Unit
 ) {
-    val perfiles by viewModel.perfiles.collectAsState(initial = emptyList())
+    val perfiles by
+        viewModel.perfiles.collectAsState(
+            initial = emptyList()
+        )
+
+    val perfilSeleccionadoId by
+        viewModel.perfilSeleccionadoId.collectAsState(
+            initial = null
+        )
 
     Scaffold(
         topBar = {
@@ -47,9 +56,14 @@ fun PerfilScreen(
                         Text("Volver")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                colors =
+                    TopAppBarDefaults
+                        .topAppBarColors(
+                            containerColor =
+                                MaterialTheme
+                                    .colorScheme
+                                    .primaryContainer
+                        )
             )
         }
     ) { innerPadding ->
@@ -59,43 +73,110 @@ fun PerfilScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement =
+                Arrangement.spacedBy(16.dp),
+            horizontalAlignment =
+                Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Perfiles registrados",
-                style = MaterialTheme.typography.headlineMedium
+                style =
+                    MaterialTheme
+                        .typography
+                        .headlineMedium
+            )
+
+            Text(
+                text =
+                    "Cada perfil conserva su propio mejor puntaje.",
+                style =
+                    MaterialTheme
+                        .typography
+                        .bodyMedium
             )
 
             if (perfiles.isEmpty()) {
                 Text(
-                    text = "Todavía no hay perfiles guardados.",
-                    style = MaterialTheme.typography.bodyLarge
+                    text =
+                        "Todavía no hay perfiles guardados.",
+                    style =
+                        MaterialTheme
+                            .typography
+                            .bodyLarge
                 )
             } else {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement =
+                        Arrangement.spacedBy(12.dp)
                 ) {
                     items(
                         items = perfiles,
-                        key = { perfil -> perfil.id }
+                        key = { perfil ->
+                            perfil.id
+                        }
                     ) { perfil ->
+
+                        val esActivo =
+                            perfil.id ==
+                                perfilSeleccionadoId
+
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier =
+                                Modifier.fillMaxWidth()
                         ) {
                             Column(
-                                modifier = Modifier.padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                                modifier =
+                                    Modifier.padding(16.dp),
+                                verticalArrangement =
+                                    Arrangement
+                                        .spacedBy(8.dp)
                             ) {
                                 Text(
                                     text = perfil.nombre,
-                                    style = MaterialTheme.typography.titleMedium
+                                    style =
+                                        MaterialTheme
+                                            .typography
+                                            .titleMedium
                                 )
-                                Text("Correo: ${perfil.correo}")
-                                Text("Dirección: ${perfil.direccion}")
+
+                                Text(
+                                    "Correo: ${perfil.correo}"
+                                )
+
+                                Text(
+                                    "Dirección: ${perfil.direccion}"
+                                )
+
+                                Text(
+                                    "🏆 Mejor puntaje: ${perfil.mejorPuntaje}"
+                                )
+
+                                if (esActivo) {
+                                    Button(
+                                        onClick = {},
+                                        enabled = false,
+                                        modifier =
+                                            Modifier.fillMaxWidth()
+                                    ) {
+                                        Text("Perfil activo")
+                                    }
+                                } else {
+                                    OutlinedButton(
+                                        onClick = {
+                                            viewModel
+                                                .seleccionarPerfil(
+                                                    perfil.id
+                                                )
+                                        },
+                                        modifier =
+                                            Modifier.fillMaxWidth()
+                                    ) {
+                                        Text("Usar este perfil")
+                                    }
+                                }
                             }
                         }
                     }
@@ -104,7 +185,8 @@ fun PerfilScreen(
 
             Button(
                 onClick = onSettingsClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier =
+                    Modifier.fillMaxWidth()
             ) {
                 Text("Ir a Configuración")
             }

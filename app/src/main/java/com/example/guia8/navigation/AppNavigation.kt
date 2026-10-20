@@ -19,12 +19,17 @@ import com.example.guia8.viewmodel.UsuarioViewModel
 @Composable
 fun AppNavigation() {
 
-    val navController = rememberNavController()
+    val navController =
+        rememberNavController()
 
-    val juegoViewModel: JuegoViewModel = viewModel()
-    val estadoJuego by juegoViewModel.estado.collectAsState()
+    val juegoViewModel:
+        JuegoViewModel = viewModel()
 
-    val usuarioViewModel: UsuarioViewModel = viewModel()
+    val estadoJuego by
+        juegoViewModel.estado.collectAsState()
+
+    val usuarioViewModel:
+        UsuarioViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -35,16 +40,28 @@ fun AppNavigation() {
             HomeScreen(
                 onJugarClick = {
                     juegoViewModel.reiniciarJuego()
-                    navController.navigate(Screen.Juego.route)
+                    navController.navigate(
+                        Screen.Juego.route
+                    )
                 },
                 onRegistroClick = {
-                    navController.navigate(Screen.Registro.route)
+                    navController.navigate(
+                        Screen.Registro.route
+                    )
                 },
                 onPerfilClick = {
-                    navController.navigate(Screen.Perfil.route)
+                    navController.navigate(
+                        Screen.Perfil.route
+                    )
                 },
-                mejorPuntaje = estadoJuego.mejorPuntaje,
-                cargandoRecord = estadoJuego.cargandoPreferencias
+                mejorPuntaje =
+                    estadoJuego.mejorPuntaje,
+                cargandoRecord =
+                    estadoJuego
+                        .cargandoPreferencias,
+                perfilActivoNombre =
+                    estadoJuego
+                        .perfilActivoNombre
             )
         }
 
@@ -52,10 +69,13 @@ fun AppNavigation() {
             RegistroScreen(
                 viewModel = usuarioViewModel,
                 onRegistroExitoso = {
-                    navController.navigate(Screen.Resumen.route)
+                    navController.navigate(
+                        Screen.Resumen.route
+                    )
                 },
                 onVolverClick = {
-                    navController.popBackStack()
+                    navController
+                        .popBackStack()
                 }
             )
         }
@@ -70,7 +90,9 @@ fun AppNavigation() {
                     )
                 },
                 onPerfilClick = {
-                    navController.navigate(Screen.Perfil.route)
+                    navController.navigate(
+                        Screen.Perfil.route
+                    )
                 }
             )
         }
@@ -91,7 +113,9 @@ fun AppNavigation() {
             PerfilScreen(
                 viewModel = usuarioViewModel,
                 onSettingsClick = {
-                    navController.navigate(Screen.Settings.route)
+                    navController.navigate(
+                        Screen.Settings.route
+                    )
                 },
                 onVolverClick = {
                     navController.popBackStack(
@@ -105,7 +129,8 @@ fun AppNavigation() {
         composable(Screen.Settings.route) {
             SettingsScreen(
                 onVolverClick = {
-                    navController.popBackStack()
+                    navController
+                        .popBackStack()
                 },
                 onInicioClick = {
                     navController.popBackStack(

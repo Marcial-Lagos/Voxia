@@ -14,16 +14,18 @@ class PreferenciasDataStore(
 ) {
 
     companion object {
-        private val CLAVE_MEJOR_PUNTAJE = intPreferencesKey("mejor_puntaje")
+        private val CLAVE_PERFIL_SELECCIONADO =
+            intPreferencesKey("perfil_seleccionado_id")
     }
 
-    val mejorPuntaje: Flow<Int> = context.dataStore.data.map { preferencias ->
-        preferencias[CLAVE_MEJOR_PUNTAJE] ?: 0
-    }
+    val perfilSeleccionadoId: Flow<Int?> =
+        context.dataStore.data.map { preferencias ->
+            preferencias[CLAVE_PERFIL_SELECCIONADO]
+        }
 
-    suspend fun guardarMejorPuntaje(puntaje: Int) {
+    suspend fun seleccionarPerfil(perfilId: Int) {
         context.dataStore.edit { preferencias ->
-            preferencias[CLAVE_MEJOR_PUNTAJE] = puntaje
+            preferencias[CLAVE_PERFIL_SELECCIONADO] = perfilId
         }
     }
 }

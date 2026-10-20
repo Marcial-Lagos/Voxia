@@ -35,7 +35,8 @@ fun HomeScreen(
     onRegistroClick: () -> Unit,
     onPerfilClick: () -> Unit,
     mejorPuntaje: Int,
-    cargandoRecord: Boolean
+    cargandoRecord: Boolean,
+    perfilActivoNombre: String?
 ) {
     Scaffold(
         topBar = {
@@ -50,10 +51,18 @@ fun HomeScreen(
                         Text("Perfil")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                colors =
+                    TopAppBarDefaults
+                        .topAppBarColors(
+                            containerColor =
+                                MaterialTheme
+                                    .colorScheme
+                                    .primaryContainer,
+                            titleContentColor =
+                                MaterialTheme
+                                    .colorScheme
+                                    .onPrimaryContainer
+                        )
             )
         }
     ) { innerPadding ->
@@ -63,56 +72,109 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement =
+                Arrangement.spacedBy(20.dp),
+            horizontalAlignment =
+                Alignment.CenterHorizontally
         ) {
             Text(
                 text = "¡Bienvenido a Voxia!",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary
+                style =
+                    MaterialTheme
+                        .typography
+                        .headlineMedium,
+                color =
+                    MaterialTheme
+                        .colorScheme
+                        .primary
             )
 
             Text(
-                text = "Aprende español jugando con palabras en turco.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                text =
+                    "Aprende español jugando con palabras en turco.",
+                style =
+                    MaterialTheme
+                        .typography
+                        .bodyLarge,
+                color =
+                    MaterialTheme
+                        .colorScheme
+                        .onSurface
             )
 
             Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo de Voxia",
+                painter =
+                    painterResource(
+                        id = R.drawable.logo
+                    ),
+                contentDescription =
+                    "Logo de Voxia",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
-                contentScale = ContentScale.Fit
+                contentScale =
+                    ContentScale.Fit
             )
 
             HorizontalDivider()
 
             Card(
-                modifier = Modifier.fillMaxWidth()
+                modifier =
+                    Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier =
+                        Modifier.padding(16.dp),
+                    verticalArrangement =
+                        Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Doğru mu? — ¿Es verdad?",
-                        style = MaterialTheme.typography.titleMedium
+                        text =
+                            "Doğru mu? — ¿Es verdad?",
+                        style =
+                            MaterialTheme
+                                .typography
+                                .titleMedium
                     )
 
                     Text(
-                        text = "Decide si la traducción Turco-Español es verdadera o falsa.",
-                        style = MaterialTheme.typography.bodyMedium
+                        text =
+                            "Decide si la traducción Turco-Español es verdadera o falsa.",
+                        style =
+                            MaterialTheme
+                                .typography
+                                .bodyMedium
+                    )
+
+                    Text(
+                        text =
+                            if (
+                                perfilActivoNombre != null
+                            ) {
+                                "Perfil activo: $perfilActivoNombre"
+                            } else {
+                                "Sin perfil activo"
+                            },
+                        style =
+                            MaterialTheme
+                                .typography
+                                .bodyMedium
                     )
 
                     if (cargandoRecord) {
                         CircularProgressIndicator()
                     } else {
                         Text(
-                            text = "🏆 Mejor puntaje: $mejorPuntaje",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            text =
+                                "🏆 Mejor puntaje: $mejorPuntaje",
+                            style =
+                                MaterialTheme
+                                    .typography
+                                    .titleSmall,
+                            color =
+                                MaterialTheme
+                                    .colorScheme
+                                    .primary
                         )
                     }
                 }
@@ -120,14 +182,16 @@ fun HomeScreen(
 
             Button(
                 onClick = onJugarClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier =
+                    Modifier.fillMaxWidth()
             ) {
                 Text("Jugar Doğru mu?")
             }
 
             OutlinedButton(
                 onClick = onRegistroClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier =
+                    Modifier.fillMaxWidth()
             ) {
                 Text("Registrarse")
             }
@@ -144,7 +208,8 @@ fun HomeScreenPreview() {
             onRegistroClick = {},
             onPerfilClick = {},
             mejorPuntaje = 4,
-            cargandoRecord = false
+            cargandoRecord = false,
+            perfilActivoNombre = "Perfil de prueba"
         )
     }
 }

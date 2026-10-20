@@ -9,5 +9,6 @@ data class PerfilEntity(
     val id: Int = 0,
     val nombre: String,
     val correo: String,
-    val direccion: String
+    val direccion: String,
+    val mejorPuntaje: Int = 0
 )

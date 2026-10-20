@@ -43,7 +43,10 @@ fun AppNavigation() {
             JuegoScreen(
                 viewModel = juegoViewModel,
                 onVolverInicio = {
-                    navController.popBackStack()
+                    navController.popBackStack(
+                        route = Screen.Home.route,
+                        inclusive = false
+                    )
                 }
             )
         }
@@ -51,18 +54,29 @@ fun AppNavigation() {
         composable(Screen.Perfil.route) {
             PerfilScreen(
                 onSettingsClick = {
-                    navController.navigate(
-                        Screen.Settings.route
-                    )
+                    navController.navigate(Screen.Settings.route)
                 },
                 onVolverClick = {
-                    navController.popBackStack()
+                    navController.popBackStack(
+                        route = Screen.Home.route,
+                        inclusive = false
+                    )
                 }
             )
         }
 
         composable(Screen.Settings.route) {
-            SettingsScreen()
+            SettingsScreen(
+                onVolverClick = {
+                    navController.popBackStack()
+                },
+                onInicioClick = {
+                    navController.popBackStack(
+                        route = Screen.Home.route,
+                        inclusive = false
+                    )
+                }
+            )
         }
     }
 }
